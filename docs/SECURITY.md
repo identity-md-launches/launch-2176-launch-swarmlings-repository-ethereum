@@ -50,15 +50,17 @@
   the locked launch position and collects its LP fee with zero-liquidity `modifyLiquidity` calls; the JIT
   penalty never applies to it, so the payer's and the network's fee arrive whole.
 - **Storage layout of the vendored DN404.** Two fields moved so tooling that writes ERC-20 storage directly
-  (forge-std `deal`, used by IMD's launch verifier) works: the balance is the first field of `AddressData`
-  (the slot's low bits) and `totalSupply` has a slot of its own. Only Solidity field access touches these, so
-  behaviour is unchanged; the full suite runs on the new layout.
+  (forge-std `deal`, used by IMD's launch verifier) works: `AddressData.balance` and `totalSupply` each have a
+  `uint256` slot of their own instead of being packed with NFT counters and flags. Only Solidity field access
+  touches these, so behaviour is unchanged; the full suite runs on the new layout and `test/DealProbe.t.sol`
+  writes balances on every account shape the verifier can touch.
 - **Pairing.** On Ethereum mainnet the reward currency is IMD and the hook binds only a LING / IMD pool;
   `test/Manifest.t.sol` fails if `launch.json` pairs LING with anything else.
 - **`BUILD_TAG`.** A constant with no effect on behaviour. IMD's protected floor mines the hook's CREATE2 salt
-  in Solidity, and launch 1954 parked when that search (57,357 salts) ran its setUp out of memory gas. The tag
-  is picked so the search ends within a few hundred salts; `test/HookSalt.t.sol` fails if a bytecode change
-  makes it long again.
+  in Solidity, from its factory probe in one suite and from the test contract in another, and a long search
+  runs that suite's setUp out of memory gas (launch 1954: 57,357 salts from the factory probe; launch 2167:
+  45,113 from the test contract). The tag is picked so both searches end within a few hundred salts;
+  `test/HookSalt.t.sol` fails if a bytecode change makes either long again.
 
 - **EIP-7702 wallets.** DN404 treats any code-bearing account as a contract that skips NFTs. A delegated EOA has
   exactly 23 bytes of code starting with `0xef0100`, a prefix EIP-3541 forbids for deployed contracts, so the

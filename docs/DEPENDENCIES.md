@@ -19,8 +19,13 @@ forge-std are test-only. This project's own Solidity is MIT-licensed.
 `lib/dn404/src/DN404.sol` differs from upstream in field order only, so tools that write ERC-20 storage
 directly (forge-std `deal`, used by IMD's launch verifier) can set LING balances and supply:
 
-- `AddressData.balance` is the first field (the slot's low 96 bits) instead of the last.
+- `AddressData.balance` is a `uint256` in a slot of its own instead of a `uint96` packed with the NFT count,
+  alias and flags. Every write still casts to `uint96`.
 - `DN404Storage.totalSupply` is a `uint256` in a slot of its own instead of a `uint96` packed with the NFT
   counters. Every write still casts to `uint96` and checks `_totalSupplyOverflows`.
+
+Both are needed because stdStorage only finds a slot whose whole value is the number it looks for: a packed
+slot stops matching as soon as the account's flags or NFT count are set, which is every account a launch has
+touched (`test/DealProbe.t.sol`).
 
 Both structs are only accessed through Solidity fields; no assembly reads them by offset.

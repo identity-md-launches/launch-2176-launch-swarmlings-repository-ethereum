@@ -69,10 +69,10 @@ contract SwarmlingsHook is IHooks, IUnlockCallback, ISwarmlingsHook {
     /// @notice The council, deployed with CREATE2 at the same address on every chain (see docs).
     address public constant COUNCIL = 0x4d0b3507D80f678d9e658Fd5482Ca6a96636A032;
     /// @notice Build tag with no effect on behaviour. IMD's protected floor mines the hook's CREATE2 salt in
-    /// Solidity from fixed probe addresses, and a long search runs its setUp out of memory gas (launch 1954
-    /// needed 57,357 salts). This value is chosen so that search ends within a few hundred salts; see
-    /// test/HookSalt.t.sol.
-    bytes32 public constant BUILD_TAG = 0x184d9531afc21a46a0cbb7a9731f40a0966c64069b5c5adc81173f1ef4de7335;
+    /// Solidity, from its factory probe and from the test contract, and a long search runs that suite's setUp
+    /// out of memory gas (launch 1954 needed 57,357 salts, launch 2167 45,113). This value is chosen so both
+    /// searches end within a hundred salts; see test/HookSalt.t.sol.
+    bytes32 public constant BUILD_TAG = 0xe9d95bd536ee9aae05c175a1c761dd6312df345bb863ffd9790d390d508dbb8e;
 
     IPoolManager public immutable poolManager;
     /// @notice The Swarmlings token.

@@ -141,10 +141,10 @@ abstract contract DN404 {
 
     /// @dev Struct containing an address's token data and settings.
     struct AddressData {
-        // The token balance in wei. Swarmlings: first, so it sits in the slot's low bits and tooling that writes
-        // an ERC-20 balance slot directly (forge-std `deal`) finds it. Only Solidity field access touches this
-        // struct, so the order is free.
-        uint96 balance;
+        // The token balance in wei. Swarmlings: a whole slot of its own, so tooling that writes an ERC-20 balance
+        // slot directly (forge-std `deal`, any version) finds it even when the account's NFT count and flags are
+        // set. Writes still cast to uint96 as upstream does. Only Solidity field access touches this struct.
+        uint256 balance;
         // The number of NFT tokens.
         uint32 ownedLength;
         // The alias for the address. Zero means absence of an alias.
